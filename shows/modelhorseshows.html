@@ -234,5 +234,33 @@
     <footer>
             <p>Registrations are now Open :)</p>
     </footer>
+
+
+
+    <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.querySelector('.read-more-btn');
+    const moreText = document.querySelector('.more-text');
+    const dots = document.querySelector('.dots');
+    const paragraph = document.querySelector('.read-more-paragraph'); // Add a class to your <p> tag
+
+    btn.addEventListener('click', () => {
+      if (moreText.style.display === "none") {
+        moreText.style.display = "inline";
+        dots.style.display = "none";
+        btn.textContent = "Read Less";
+      } else {
+        moreText.style.display = "none";
+        dots.style.display = "inline";
+        btn.textContent = "Read More";
+
+        // Scroll to top of paragraph smoothly
+        paragraph.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+    
+</script>
 </body>
 </html>
