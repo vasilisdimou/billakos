@@ -108,44 +108,64 @@
 }
 
 
-        // ====== EMAIL SUBMISSION ======
+  // ====== EMAIL SUBMISSION WITH RECAPTCHA ======
 document.addEventListener('DOMContentLoaded', () => {
   const subscribeForm = document.getElementById('subscribeForm');
   const subscribeMessage = document.getElementById('subscribeMessage');
 
-  if (subscribeForm) {
-    subscribeForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const emailInput = document.getElementById('emailInput');
-      const email = emailInput.value.trim();
+  if (!subscribeForm) return;
 
-      if (!email) {
-        subscribeMessage.style.color = "red";
-        subscribeMessage.textContent = "Please enter a valid email.";
-        return;
-      }
+  subscribeForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-      try {
-        // Save email + timestamp to Firestore collection "emails"
-        await addDoc(collection(db, 'emails'), {
-          email: email,
-          timestamp: serverTimestamp()
-        });
+    const emailInput = document.getElementById('emailInput');
+    const email = emailInput.value.trim();
 
-        subscribeMessage.style.color = "green";
-        subscribeMessage.textContent = "✅ Thanks for subscribing!";
-        emailInput.value = "";
-      } catch (error) {
-        console.error("Error saving email:", error);
-        subscribeMessage.style.color = "red";
-        subscribeMessage.textContent = "❌ Failed to save email.";
-      }
-    });
-  }
+    // 1. Basic validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      subscribeMessage.style.color = "red";
+      subscribeMessage.textContent = "Please enter a valid email.";
+      return;
+    }
+
+    // 2. Get reCAPTCHA response
+    const recaptchaResponse = grecaptcha.getResponse();
+
+    if (!recaptchaResponse) {
+      subscribeMessage.style.color = "red";
+      subscribeMessage.textContent = "Please verify you're not a robot.";
+      return;
+    }
+
+    try {
+      // 3. OPTIONAL but recommended: verify CAPTCHA server-side
+      // (This is frontend-only version; still good improvement)
+      
+      await addDoc(collection(db, 'emails'), {
+        email: email,
+        recaptcha: recaptchaResponse,
+        timestamp: serverTimestamp()
+      });
+
+      subscribeMessage.style.color = "green";
+      subscribeMessage.textContent = "✅ Thanks for subscribing!";
+
+      emailInput.value = "";
+      grecaptcha.reset();
+
+    } catch (error) {
+      console.error(error);
+      subscribeMessage.style.color = "red";
+      subscribeMessage.textContent = "❌ Failed to save email.";
+    }
+  });
 });
 
         
     </script>
+
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
     <header>
@@ -216,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="sparkle-wrapper">
     
     
-    <div class="subscribe-container">
+   <!-- <div class="subscribe-container">
         
   <h3>Subscribe for Post Reminders!</h3>
   <form id="subscribeForm">
@@ -225,6 +245,22 @@ document.addEventListener('DOMContentLoaded', () => {
   </form>
   <p id="subscribeMessage" style="margin-top: 10px; color: green;"></p>
         <p>There won't be more than 2 mails a month. Probably 0-1 per month. If you want to unsubscribe, please <a href="mailto:billakosmodelhorses@gmail.com">email me.</a></p>
+</div> -->
+
+    <div class="subscribe-container">
+  <h3>Subscribe for Post Reminders!</h3>
+
+  <form id="subscribeForm">
+    <input type="email" id="emailInput" placeholder="Enter your email" required>
+
+    <!-- reCAPTCHA -->
+    <div class="g-recaptcha"
+         data-sitekey="6Lc4UyEtAAAAAJ747iPI2AmtIoXPR7AcQuJZoTw6"></div>
+
+    <button type="submit">Subscribe</button>
+  </form>
+
+  <p id="subscribeMessage" style="margin-top: 10px;"></p>
 </div>
 
 
