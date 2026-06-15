@@ -193,7 +193,7 @@ function moveBag() {
 function checkGameOver() {
   if (missedItems >= maxMisses) {
     isGameRunning = false;
-    alert(`Game Over! You caught ${score} models`);
+    alert(`Some Ponies got away! You collected ${score} models :)`);
     location.reload();
   }
 }
