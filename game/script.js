@@ -33,12 +33,14 @@ let assetsLoaded = false;
 // ----------------------
 
 const itemImages = [
+ 
   "https://i.postimg.cc/fbKqSZjJ/4087-C893-8-D2-D-4197-BADD-392-F80-C0-CEF4.png",
   "https://i.postimg.cc/W3NK5tbG/4-B1107-CA-21-CA-4-B9-E-8647-74967-C040-F14.png",
   "https://i.postimg.cc/fLqH5KPs/6-C4-DE37-F-8047-4-D83-A111-1-CC8-C558-BC1-C.png",
   "https://i.postimg.cc/BQrVdmnQ/7-F1999-A8-E275-4-DF2-A29-A-AE74663-D0-B78.png",
   "https://i.postimg.cc/J4DF6fm2/8-C6600-A9-B3-C4-4-E8-A-9-A15-6-D00-C6-A7-CE37.png",
   "https://i.postimg.cc/7hbRyczb/AA96080-B-BD6-C-45-D5-A28-E-277-E25-DE0-E6-E.png",
+
   "https://i.postimg.cc/0NxHNrST/AEA17193-29-C1-4-FC8-A2-E4-03-BC015-C02-F8.png",
   "https://i.postimg.cc/xC6ZhYcW/B9-F0835-B-DD2-B-4-BFC-8073-6-DC5-D596-E33-E.png",
   "https://i.postimg.cc/YSfZNQk2/D1-A6564-C-C325-4-A19-8-B75-EA8-C72-C37-FEF.png",
@@ -47,13 +49,32 @@ const itemImages = [
   "https://i.postimg.cc/904Lk937/FABB6-A5-C-8-DA3-46-F6-BB8-F-7-C82588-A47-E8.png",
   "https://i.postimg.cc/WzKHpnm8/FADCD8-B3-F4-E9-4-CC3-AB19-BD85934-A6-E84.png",
 
-  "https://i.postimg.cc/g02Gj4T5/712451-Tabitha.webp",
-  "https://i.postimg.cc/xd198g44/712481-Centerpiece.webp",
-  "https://i.postimg.cc/3wx3N9cq/712482-Oklahoma.webp",
-  "https://i.postimg.cc/Pq5dJKR9/712487-Biscuits.webp",
-  "https://i.postimg.cc/DzpnXs9B/712513-Slither.webp",
-  "https://i.postimg.cc/g0tmZRCg/712535-Faded.webp",
-  "https://i.postimg.cc/wB4gmJCW/712536-Redbud.webp"
+  "https://i.postimg.cc/g02Gj4T5/712451-Tabitha-E2-80-93-FS-Halloween-silo-r2-600x600.webp",
+  "https://i.postimg.cc/xd198g44/712481-Centerpiece-R-600x600.webp",
+  "https://i.postimg.cc/3wx3N9cq/712482-Oklahoma-Rose-R-600x600.webp",
+  "https://i.postimg.cc/Pq5dJKR9/712487-Biscuits-Gravy-together-600x600.webp",
+  "https://i.postimg.cc/DzpnXs9B/712513-Slither-right-600x600.webp",
+  "https://i.postimg.cc/g0tmZRCg/712535-Faded-Love-R-600x600.webp",
+  "https://i.postimg.cc/wB4gmJCW/712536-Redbud-R-600x600.webp",
+
+  "https://i.postimg.cc/5tKbCvhG/B-EV-10472-Salud-Black-L-1024x1024.webp",
+  "https://i.postimg.cc/DzpnXs9t/B-EV-10472-Salud-Grey-L-1024x1024.webp",
+  "https://i.postimg.cc/Xv14CFRP/B-EV-10516-Legacy-L-1024x1024.webp",
+  "https://i.postimg.cc/d0NwydbN/B-EV-10517-Tamarkuz-R-1024x1024.webp",
+  "https://i.postimg.cc/7Ltw20vr/B-EV-10722-Corgi-Hill-Flinka-064-1024x1024.webp",
+  "https://i.postimg.cc/pdcRFzNH/ned2-480x480.webp",
+  "https://i.postimg.cc/d0NwyrMw/preview-1024x1024.webp",
+
+  "https://i.postimg.cc/3wfYvmM7/rosanna1-1024x1024.webp",
+  "https://i.postimg.cc/mrpBHCxZ/wimpy-R-FINAL-600x600.webp",
+
+  "https://i.postimg.cc/mr6Cd196/Untitled685-20260616014710.png",
+  "https://i.postimg.cc/Ls0LygPQ/Untitled685-20260616014731.png",
+  "https://i.postimg.cc/KYsB93T9/Untitled685-20260616014800.png",
+  "https://i.postimg.cc/XvDd2B5H/Untitled685-20260616014906.png",
+  "https://i.postimg.cc/W4fg9qZK/Untitled685-20260616014934.png",
+  "https://i.postimg.cc/nrKstXss/Untitled685-20260616015219.png"
+
 ];
 
 // Loaded Image objects
