@@ -224,7 +224,7 @@ function drawItems() {
 
 function drawHUD() {
   ctx.fillStyle = "white";
-  ctx.font = "17px Arial";
+  ctx.font = "17px Oswald";
   ctx.fillText(`Score: ${score}`, 10, 20);
   ctx.fillText(`Missed: ${missedItems}/${maxMisses}`, 10, 40);
 }
