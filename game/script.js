@@ -47,7 +47,7 @@ const itemImages = [
   "https://i.postimg.cc/NMjJ1Vpb/F399-E083-BC3-E-4-E54-AB7-D-BBA7-B9601934.png",
   "https://i.postimg.cc/DfYDcvVG/F930-C266-993-E-4-CBD-9731-3766016-C8400.png",
   "https://i.postimg.cc/904Lk937/FABB6-A5-C-8-DA3-46-F6-BB8-F-7-C82588-A47-E8.png",
-  "https://i.postimg.cc/WzKHpnm8/FADCD8-B3-F4-E9-4-CC3-AB19-BD85934-A6-E84.png",
+  
 
   "https://i.postimg.cc/g02Gj4T5/712451-Tabitha-E2-80-93-FS-Halloween-silo-r2-600x600.webp",
   "https://i.postimg.cc/xd198g44/712481-Centerpiece-R-600x600.webp",
