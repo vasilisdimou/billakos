@@ -297,10 +297,17 @@ function startGame() {
 
 function openGameModal() {
   gameModal.style.display = "block";
+
+ // Prevent page scrolling
+  document.body.style.overflow = "hidden";
+ 
   startGame();
 }
 
 function closeGameModal() {
+// Re-enable page scrolling
+  document.body.style.overflow = "";
+ 
   gameModal.style.display = "none";
   location.reload();
 }
