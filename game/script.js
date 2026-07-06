@@ -73,7 +73,7 @@ const itemImages = [
   "https://i.postimg.cc/KYsB93T9/Untitled685-20260616014800.png",
   "https://i.postimg.cc/XvDd2B5H/Untitled685-20260616014906.png",
   "https://i.postimg.cc/W4fg9qZK/Untitled685-20260616014934.png",
-  "https://i.postimg.cc/nrKstXss/Untitled685-20260616015219.png"
+  "https://i.postimg.cc/nrKstXss/Untitled685-20260616015219.png",
 
   "https://i.postimg.cc/85xfhqnG/Untitled6-20260707005004.png",
  "https://i.postimg.cc/Px0vmBFk/Untitled6-20260707005045.png",
