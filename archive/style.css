@@ -377,5 +377,13 @@ section {
 }
 
 
+/* Responsive scaling */
+@media (max-width: 600px) {
+    .outside-sparkle {
+        font-size: 1.2em;
+        filter: drop-shadow(0 0 4px gold);
+    }
+}
+
 
 
