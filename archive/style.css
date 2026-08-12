@@ -377,13 +377,11 @@ section {
 }
 
 
-/* Responsive scaling */
-@media (max-width: 600px) {
-    .outside-sparkle {
-        font-size: 1.2em;
-        filter: drop-shadow(0 0 4px gold);
-    }
-}
+.responsive-image {
+            max-width: 100%; /* The image will never exceed the width of its container */
+            height: auto; /* Maintain the aspect ratio */
+border-radius: 20px; /* Make the corners slightly rounded */
+        }
 
 
 
