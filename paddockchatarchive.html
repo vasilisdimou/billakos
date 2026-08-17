@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <title>Paddock Chat Archive</title>
+
+    <link rel="stylesheet" href="style.css">
+
+
+    <!-- =========================================
+         FAVICON
+    ========================================== -->
+
+    <link
+        rel="icon"
+        href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png"
+        type="image/png">
+
+
+    <link
+        rel="apple-touch-icon"
+        href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png">
+
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png">
+
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="16x16"
+        href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png">
+
+
+    <!-- =========================================
+         GOOGLE FONT
+    ========================================== -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+
+    <!-- =========================================
+         FIREBASE
+    ========================================== -->
+
+    <script type="module">
+
+
+        import { initializeApp }
+            from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+
+
+        import {
+
+            getFirestore,
+
+            collection,
+
+            query,
+
+            where,
+
+            orderBy,
+
+            getDocs
+
+        }
+        from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+
+        import { getAnalytics }
+            from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+
+
+
+        /* =========================================
+           FIREBASE CONFIGURATION
+        ========================================= */
+
+        const firebaseConfig = {
+
+
+            apiKey:
+                "AIzaSyAJUJbeZ9ceRwaQOCboy79LEwbN-I7R9ro",
+
+
+            authDomain:
+                "billakosmodelhorses.firebaseapp.com",
+
+
+            projectId:
+                "billakosmodelhorses",
+
+
+            storageBucket:
+                "billakosmodelhorses.appspot.com",
+
+
+            messagingSenderId:
+                "988607299628",
+
+
+            appId:
+                "1:988607299628:web:b7c2139b095a0afba8d189",
+
+
+            measurementId:
+                "G-RWHNVMHN2P"
+
+
+        };
+
+
+
+        /* =========================================
+           INITIALIZE FIREBASE
+        ========================================== */
+
+        const app =
+            initializeApp(firebaseConfig);
+
+
+        getAnalytics(app);
+
+
+        const db =
+            getFirestore(app);
+
+
+
+        /* =========================================
+           GET DATE 2 MONTHS AGO
+        ========================================== */
+
+        function getTwoMonthsAgo() {
+
+
+            const date =
+                new Date();
+
+
+            date.setMonth(
+                date.getMonth() - 2
+            );
+
+
+            return date;
+
+
+        }
+
+
+
+        /* =========================================
+           LOAD ARCHIVED COMMENTS
+        ========================================== */
+
+        async function loadArchivedComments() {
+
+
+            try {
+
+
+                const twoMonthsAgo =
+                    getTwoMonthsAgo();
+
+
+                const commentsCollection =
+                    collection(
+                        db,
+                        "paddockchat"
+                    );
+
+
+                const q = query(
+
+
+                    commentsCollection,
+
+
+                    where(
+                        "timestamp",
+                        "<",
+                        twoMonthsAgo
+                    ),
+
+
+                    orderBy(
+                        "timestamp",
+                        "desc"
+                    )
+
+
+                );
+
+
+                const querySnapshot =
+                    await getDocs(q);
+
+
+                const comments =
+                    querySnapshot.docs.map(doc => ({
+
+
+                        id: doc.id,
+
+
+                        ...doc.data()
+
+
+                    }));
+
+
+                renderComments(
+                    comments
+                );
+
+
+            }
+
+
+            catch (error) {
+
+
+                console.error(
+                    "Error loading archived comments:",
+                    error
+                );
+
+
+                document
+                    .getElementById(
+                        "commentsSection"
+                    )
+                    .innerHTML =
+
+                    "<p>There was an error loading the archived messages.</p>";
+
+
+            }
+
+
+        }
+
+
+
+        /* =========================================
+           DISPLAY ARCHIVED COMMENTS
+        ========================================== */
+
+        function renderComments(
+            comments
+        ) {
+
+
+            const commentsSection =
+                document.getElementById(
+                    "commentsSection"
+                );
+
+
+            commentsSection.innerHTML =
+                "";
+
+
+            if (
+                comments.length === 0
+            ) {
+
+
+                commentsSection.innerHTML =
+
+                    "<p>There are no archived messages yet.</p>";
+
+
+                return;
+
+
+            }
+
+
+
+            comments.forEach(
+                comment => {
+
+
+                    const commentDiv =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    commentDiv.style.marginBottom =
+                        "25px";
+
+
+
+                    /* NAME */
+
+                    const namePara =
+                        document.createElement(
+                            "p"
+                        );
+
+
+                    namePara.style.fontWeight =
+                        "bold";
+
+
+                    namePara.textContent =
+                        `${comment.name} wrote:`;
+
+
+
+                    /* MESSAGE */
+
+                    const commentPara =
+                        document.createElement(
+                            "p"
+                        );
+
+
+                    /*
+                     * textContent keeps the messages safe.
+                     */
+
+                    commentPara.textContent =
+                        comment.text;
+
+
+
+                    /* DATE */
+
+                    const datePara =
+                        document.createElement(
+                            "small"
+                        );
+
+
+                    if (
+                        comment.timestamp
+                    ) {
+
+
+                        const date =
+                            comment.timestamp.toDate();
+
+
+                        datePara.textContent =
+                            date.toLocaleString();
+
+
+                    }
+
+
+
+                    /* ADD TO PAGE */
+
+                    commentDiv.appendChild(
+                        namePara
+                    );
+
+
+                    commentDiv.appendChild(
+                        commentPara
+                    );
+
+
+                    commentDiv.appendChild(
+                        datePara
+                    );
+
+
+                    commentsSection.appendChild(
+                        commentDiv
+                    );
+
+
+                }
+            );
+
+
+        }
+
+
+
+        /* =========================================
+           LOAD WHEN PAGE OPENS
+        ========================================== */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+
+                loadArchivedComments();
+
+
+            }
+        );
+
+
+    </script>
+
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <header class="header-with-image">
+
+
+        <img
+            src="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png"
+            alt="Logo"
+            class="header-logo">
+
+
+        <h1>
+            Paddock Chat Archive
+        </h1>
+
+
+    </header>
+
+
+
+    <!-- =========================================
+         NAVIGATION
+    ========================================== -->
+
+    <nav>
+
+
+        <a href="https://billakosmodelhorses.com">
+            Home
+        </a>
+
+
+        <a href="https://billakosmodelhorses.com/stablestories.html">
+            Stable Stories
+        </a>
+
+
+        <a href="https://billakosmodelhorses.com/shows/modelhorseshows">
+            Shows
+        </a>
+
+
+        <a href="https://billakosmodelhorses.com/paddockchat.html">
+            Chat
+        </a>
+
+
+        <a href="https://billakosmodelhorses.com/paddockchat-archive.html">
+            Chat Archive
+        </a>
+
+
+    </nav>
+
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <section>
+
+
+        <center>
+
+
+            <h2>
+                Paddock Chat Archive
+            </h2>
+
+
+        </center>
+
+
+
+        <p>
+
+
+            Welcome to the Paddock Chat Archive!
+
+
+            Messages remain here after they become
+            more than two months old.
+
+
+            The messages are not deleted;
+            they are simply moved from the main
+            Paddock Chat page to this archive automatically.
+
+
+        </p>
+
+
+
+        <!-- =========================================
+             ARCHIVED MESSAGES
+        ========================================== -->
+
+        <div class="comments-display-container">
+
+
+            <h3>
+                Archived Messages:
+            </h3>
+
+
+            <div id="commentsSection">
+
+
+                <p>
+                    Loading archived messages...
+                </p>
+
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <br><br><br>
+
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================== -->
+
+    <footer>
+
+
+        <p>
+            Have fun chatting :)
+        </p>
+
+
+    </footer>
+
+
+</body>
+
+</html>
