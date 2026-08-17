@@ -8,27 +8,22 @@
     <link rel="stylesheet" href="style.css">
 
 
-    <!-- =========================================
-         FAVICON
-    ========================================== -->
+    <!-- Favicon -->
 
     <link
         rel="icon"
         href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png"
         type="image/png">
 
-
     <link
         rel="apple-touch-icon"
         href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png">
-
 
     <link
         rel="icon"
         type="image/png"
         sizes="32x32"
         href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png">
-
 
     <link
         rel="icon"
@@ -37,9 +32,7 @@
         href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png">
 
 
-    <!-- =========================================
-         GOOGLE FONT
-    ========================================== -->
+    <!-- Google Font -->
 
     <link
         href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap"
@@ -51,6 +44,56 @@
         content="width=device-width, initial-scale=1.0">
 
 
+    <style>
+
+        /* Images inside archived messages */
+
+        .chat-image {
+
+            max-width: 100%;
+
+            width: 400px;
+
+            height: auto;
+
+            border-radius: 20px;
+
+            display: block;
+
+            margin-top: 10px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        /* Keep long messages from overflowing */
+
+        .chat-message {
+
+            overflow-wrap: anywhere;
+
+        }
+
+
+        /* Archive date */
+
+        .chat-date {
+
+            display: block;
+
+            margin-top: 5px;
+
+            font-size: 0.85em;
+
+            opacity: 0.7;
+
+        }
+
+
+    </style>
+
+
     <!-- =========================================
          FIREBASE
     ========================================== -->
@@ -59,6 +102,7 @@
 
 
         import { initializeApp }
+
             from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 
 
@@ -77,51 +121,44 @@
             getDocs
 
         }
+
         from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 
         import { getAnalytics }
+
             from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
 
 
 
         /* =========================================
-           FIREBASE CONFIGURATION
-        ========================================= */
+           FIREBASE CONFIG
+        ========================================== */
 
         const firebaseConfig = {
-
 
             apiKey:
                 "AIzaSyAJUJbeZ9ceRwaQOCboy79LEwbN-I7R9ro",
 
-
             authDomain:
                 "billakosmodelhorses.firebaseapp.com",
-
 
             projectId:
                 "billakosmodelhorses",
 
-
             storageBucket:
                 "billakosmodelhorses.appspot.com",
-
 
             messagingSenderId:
                 "988607299628",
 
-
             appId:
                 "1:988607299628:web:b7c2139b095a0afba8d189",
-
 
             measurementId:
                 "G-RWHNVMHN2P"
 
-
         };
-
 
 
         /* =========================================
@@ -131,9 +168,7 @@
         const app =
             initializeApp(firebaseConfig);
 
-
         getAnalytics(app);
-
 
         const db =
             getFirestore(app);
@@ -141,23 +176,18 @@
 
 
         /* =========================================
-           GET DATE 2 MONTHS AGO
+           TWO MONTHS AGO
         ========================================== */
 
         function getTwoMonthsAgo() {
 
-
-            const date =
-                new Date();
-
+            const date = new Date();
 
             date.setMonth(
                 date.getMonth() - 2
             );
 
-
             return date;
-
 
         }
 
@@ -169,9 +199,7 @@
 
         async function loadArchivedComments() {
 
-
             try {
-
 
                 const twoMonthsAgo =
                     getTwoMonthsAgo();
@@ -186,9 +214,7 @@
 
                 const q = query(
 
-
                     commentsCollection,
-
 
                     where(
                         "timestamp",
@@ -196,12 +222,10 @@
                         twoMonthsAgo
                     ),
 
-
                     orderBy(
                         "timestamp",
                         "desc"
                     )
-
 
                 );
 
@@ -211,28 +235,21 @@
 
 
                 const comments =
-                    querySnapshot.docs.map(doc => ({
+                    querySnapshot.docs.map(
+                        doc => ({
+
+                            id: doc.id,
+
+                            ...doc.data()
+
+                        })
+                    );
 
 
-                        id: doc.id,
+                renderComments(comments);
 
 
-                        ...doc.data()
-
-
-                    }));
-
-
-                renderComments(
-                    comments
-                );
-
-
-            }
-
-
-            catch (error) {
-
+            } catch (error) {
 
                 console.error(
                     "Error loading archived comments:",
@@ -248,21 +265,173 @@
 
                     "<p>There was an error loading the archived messages.</p>";
 
-
             }
-
 
         }
 
 
 
         /* =========================================
-           DISPLAY ARCHIVED COMMENTS
+           FORMAT MESSAGE
         ========================================== */
 
-        function renderComments(
-            comments
-        ) {
+        function formatMessage(text) {
+
+
+            /*
+             * Create a temporary container.
+             * This allows us to safely process the
+             * HTML that people have entered.
+             */
+
+            const container =
+                document.createElement("div");
+
+
+            container.innerHTML =
+                text;
+
+
+            /*
+             * Remove dangerous elements.
+             */
+
+            const dangerousElements =
+                container.querySelectorAll(
+                    "script, iframe, object, embed, form, style, link, meta"
+                );
+
+
+            dangerousElements.forEach(
+                element => element.remove()
+            );
+
+
+            /*
+             * Remove dangerous attributes.
+             */
+
+            const allElements =
+                container.querySelectorAll("*");
+
+
+            allElements.forEach(
+                element => {
+
+                    [...element.attributes].forEach(
+                        attribute => {
+
+                            const name =
+                                attribute.name.toLowerCase();
+
+
+                            const value =
+                                attribute.value;
+
+
+                            /*
+                             * Remove event handlers
+                             * such as onclick, onerror etc.
+                             */
+
+                            if (
+                                name.startsWith("on")
+                            ) {
+
+                                element.removeAttribute(
+                                    attribute.name
+                                );
+
+                            }
+
+
+                            /*
+                             * Only allow safe image URLs.
+                             */
+
+                            if (
+                                element.tagName === "IMG" &&
+                                name === "src"
+                            ) {
+
+                                if (
+                                    !value.startsWith("https://") &&
+                                    !value.startsWith("http://")
+                                ) {
+
+                                    element.removeAttribute(
+                                        attribute.name
+                                    );
+
+                                }
+
+                            }
+
+
+                            /*
+                             * Remove javascript URLs.
+                             */
+
+                            if (
+                                (
+                                    name === "href" ||
+                                    name === "src"
+                                ) &&
+                                value
+                                    .toLowerCase()
+                                    .trim()
+                                    .startsWith("javascript:")
+                            ) {
+
+                                element.removeAttribute(
+                                    attribute.name
+                                );
+
+                            }
+
+                        }
+                    );
+
+
+                    /*
+                     * Make images responsive.
+                     */
+
+                    if (
+                        element.tagName === "IMG"
+                    ) {
+
+                        element.classList.add(
+                            "chat-image"
+                        );
+
+
+                        element.removeAttribute(
+                            "onerror"
+                        );
+
+
+                    }
+
+                }
+            );
+
+
+            /*
+             * Return the cleaned HTML.
+             */
+
+            return container.innerHTML;
+
+        }
+
+
+
+        /* =========================================
+           DISPLAY COMMENTS
+        ========================================== */
+
+        function renderComments(comments) {
 
 
             const commentsSection =
@@ -271,25 +440,20 @@
                 );
 
 
-            commentsSection.innerHTML =
-                "";
+            commentsSection.innerHTML = "";
 
 
             if (
                 comments.length === 0
             ) {
 
-
                 commentsSection.innerHTML =
 
                     "<p>There are no archived messages yet.</p>";
 
-
                 return;
 
-
             }
-
 
 
             comments.forEach(
@@ -297,22 +461,19 @@
 
 
                     const commentDiv =
-                        document.createElement(
-                            "div"
-                        );
+                        document.createElement("div");
 
 
                     commentDiv.style.marginBottom =
                         "25px";
 
 
-
-                    /* NAME */
+                    /* =========================
+                       NAME
+                    ========================= */
 
                     const namePara =
-                        document.createElement(
-                            "p"
-                        );
+                        document.createElement("p");
 
 
                     namePara.style.fontWeight =
@@ -323,36 +484,44 @@
                         `${comment.name} wrote:`;
 
 
-
-                    /* MESSAGE */
+                    /* =========================
+                       MESSAGE
+                    ========================= */
 
                     const commentPara =
-                        document.createElement(
-                            "p"
-                        );
+                        document.createElement("div");
+
+
+                    commentPara.className =
+                        "chat-message";
 
 
                     /*
-                     * textContent keeps the messages safe.
+                     * Use the same HTML that was
+                     * entered into the chat.
                      */
 
-                    commentPara.textContent =
-                        comment.text;
+                    commentPara.innerHTML =
+                        formatMessage(
+                            comment.text
+                        );
 
 
-
-                    /* DATE */
+                    /* =========================
+                       DATE
+                    ========================= */
 
                     const datePara =
-                        document.createElement(
-                            "small"
-                        );
+                        document.createElement("small");
+
+
+                    datePara.className =
+                        "chat-date";
 
 
                     if (
                         comment.timestamp
                     ) {
-
 
                         const date =
                             comment.timestamp.toDate();
@@ -361,12 +530,12 @@
                         datePara.textContent =
                             date.toLocaleString();
 
-
                     }
 
 
-
-                    /* ADD TO PAGE */
+                    /* =========================
+                       ADD TO PAGE
+                    ========================= */
 
                     commentDiv.appendChild(
                         namePara
@@ -391,7 +560,6 @@
                 }
             );
 
-
         }
 
 
@@ -404,16 +572,13 @@
             "DOMContentLoaded",
             () => {
 
-
                 loadArchivedComments();
-
 
             }
         );
 
 
     </script>
-
 
 </head>
 
@@ -488,30 +653,32 @@
 
         <center>
 
-
             <h2>
                 Paddock Chat Archive
             </h2>
 
-
         </center>
-
 
 
         <p>
 
-
             Welcome to the Paddock Chat Archive!
-
 
             Messages remain here after they become
             more than two months old.
-
 
             The messages are not deleted;
             they are simply moved from the main
             Paddock Chat page to this archive automatically.
 
+        </p>
+
+
+        <p>
+
+            <a href="https://billakosmodelhorses.com/paddockchat.html">
+                ← Back to the current Paddock Chat
+            </a>
 
         </p>
 
@@ -541,6 +708,80 @@
 
 
         </div>
+
+
+
+        <!-- =========================================
+             PHOTO UPLOADING
+        ========================================== -->
+
+        <br>
+
+
+        <h2>
+            Photo Uploading
+        </h2>
+
+
+        <p>
+
+            1. Visit this free image hosting website
+            and upload your photo:
+
+            <a href="https://postimages.org"
+               target="_blank">
+
+                postimages.org
+
+            </a>
+
+        </p>
+
+
+        <p>
+
+            2. Copy the direct link (the 2nd)
+            and use it in your message.
+
+        </p>
+
+
+        <p>
+
+            You can use:
+
+        </p>
+
+
+        <p>
+
+            <code>
+
+                &lt;div class="blog-post"&gt;
+                &lt;center&gt;
+                &lt;img src="IMAGE LINK" width="400" height="400"&gt;
+                &lt;/center&gt;
+                &lt;/div&gt;
+
+            </code>
+
+        </p>
+
+
+        <p>
+
+            You can write whatever you want and
+            then add an image.
+
+            You can also add text after the image.
+
+            If you want more images, just add more
+            <code>
+                &lt;img src="IMAGE LINK"&gt;
+            </code>
+            elements.
+
+        </p>
 
 
     </section>
