@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <title>Paddock Chat</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Favicon -->
+    <link rel="icon"
+        href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png"
+        type="image/png">
+
+    <link rel="apple-touch-icon"
+        href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png">
+
+    <link rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png">
+
+    <link rel="icon"
+        type="image/png"
+        sizes="16x16"
+        href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png">
+
+
+    <!-- Google Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+
+    <!-- Firebase -->
+    <script type="module">
+
+        import { initializeApp }
+            from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            serverTimestamp,
+            query,
+            orderBy,
+            where,
+            getDocs
+        }
+        from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        import { getAnalytics }
+            from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+
+
+        /* =========================================
+           FIREBASE CONFIGURATION
+        ========================================= */
+
+        const firebaseConfig = {
+
+            apiKey: "AIzaSyAJUJbeZ9ceRwaQOCboy79LEwbN-I7R9ro",
+
+            authDomain: "billakosmodelhorses.firebaseapp.com",
+
+            projectId: "billakosmodelhorses",
+
+            storageBucket: "billakosmodelhorses.appspot.com",
+
+            messagingSenderId: "988607299628",
+
+            appId: "1:988607299628:web:b7c2139b095a0afba8d189",
+
+            measurementId: "G-RWHNVMHN2P"
+
+        };
+
+
+        /* =========================================
+           INITIALIZE FIREBASE
+        ========================================= */
+
+        const app = initializeApp(firebaseConfig);
+
+        getAnalytics(app);
+
+        const db = getFirestore(app);
+
+
+        /* =========================================
+           GET DATE 2 MONTHS AGO
+        ========================================= */
+
+        function getTwoMonthsAgo() {
+
+            const date = new Date();
+
+            date.setMonth(date.getMonth() - 2);
+
+            return date;
+
+        }
+
+
+        /* =========================================
+           LOAD ONLY RECENT COMMENTS
+        ========================================= */
+
+        async function loadComments() {
+
+            try {
+
+                const twoMonthsAgo = getTwoMonthsAgo();
+
+                const commentsCollection =
+                    collection(db, "paddockchat");
+
+
+                const q = query(
+
+                    commentsCollection,
+
+                    where(
+                        "timestamp",
+                        ">=",
+                        twoMonthsAgo
+                    ),
+
+                    orderBy(
+                        "timestamp",
+                        "desc"
+                    )
+
+                );
+
+
+                const querySnapshot =
+                    await getDocs(q);
+
+
+                const comments =
+                    querySnapshot.docs.map(doc => ({
+
+                        id: doc.id,
+
+                        ...doc.data()
+
+                    }));
+
+
+                renderComments(comments);
+
+
+            } catch (error) {
+
+                console.error(
+                    "Error loading comments:",
+                    error
+                );
+
+
+                document.getElementById(
+                    "commentsSection"
+                ).innerHTML =
+
+                    "<p>There was an error loading the messages.</p>";
+
+            }
+
+        }
+
+
+        /* =========================================
+           SUBMIT NEW COMMENT
+        ========================================= */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+
+                document
+                    .getElementById("commentForm")
+                    .addEventListener(
+                        "submit",
+                        async function (event) {
+
+                            event.preventDefault();
+
+
+                            const name =
+                                document
+                                    .getElementById("nameInput")
+                                    .value
+                                    .trim();
+
+
+                            const text =
+                                document
+                                    .getElementById("commentInput")
+                                    .value
+                                    .trim();
+
+
+                            if (!name || !text) {
+
+                                return;
+
+                            }
+
+
+                            try {
+
+
+                                await addDoc(
+
+                                    collection(
+                                        db,
+                                        "paddockchat"
+                                    ),
+
+                                    {
+
+                                        name: name,
+
+                                        text: text,
+
+                                        timestamp:
+                                            serverTimestamp()
+
+                                    }
+
+                                );
+
+
+                                /* Clear form */
+
+                                document
+                                    .getElementById("nameInput")
+                                    .value = "";
+
+
+                                document
+                                    .getElementById("commentInput")
+                                    .value = "";
+
+
+                                /* Reload messages */
+
+                                loadComments();
+
+
+                            } catch (error) {
+
+
+                                console.error(
+                                    "Error adding comment:",
+                                    error
+                                );
+
+
+                                alert(
+                                    "There was an error posting your message. Please try again."
+                                );
+
+                            }
+
+                        }
+                    );
+
+
+                /* Load comments when page opens */
+
+                loadComments();
+
+            }
+        );
+
+
+        /* =========================================
+           DISPLAY COMMENTS
+        ========================================= */
+
+        function renderComments(comments) {
+
+
+            const commentsSection =
+                document.getElementById(
+                    "commentsSection"
+                );
+
+
+            commentsSection.innerHTML = "";
+
+
+            if (comments.length === 0) {
+
+                commentsSection.innerHTML =
+
+                    "<p>No messages have been posted during the past 2 months.</p>";
+
+                return;
+
+            }
+
+
+            comments.forEach(comment => {
+
+
+                const commentDiv =
+                    document.createElement("div");
+
+
+                commentDiv.style.marginBottom =
+                    "15px";
+
+
+                /* Name */
+
+                const namePara =
+                    document.createElement("p");
+
+
+                namePara.style.fontWeight =
+                    "bold";
+
+
+                namePara.textContent =
+                    `${comment.name} wrote:`;
+
+
+                /* Message */
+
+                const commentPara =
+                    document.createElement("p");
+
+
+                /*
+                 * textContent is used instead of innerHTML
+                 * so people cannot insert HTML/JavaScript.
+                 */
+
+                commentPara.textContent =
+                    comment.text;
+
+
+                /* Add elements */
+
+                commentDiv.appendChild(
+                    namePara
+                );
+
+
+                commentDiv.appendChild(
+                    commentPara
+                );
+
+
+                commentsSection.appendChild(
+                    commentDiv
+                );
+
+
+            });
+
+        }
+
+    </script>
+
+
+    <style>
+
+        /* Responsive image */
+
+        .responsive-image {
+
+            max-width: 100%;
+
+            height: auto;
+
+            border-radius: 20px;
+
+        }
+
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <header class="header-with-image">
+
+        <img
+            src="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png"
+            alt="Logo"
+            class="header-logo">
+
+        <h1>Paddock Chat</h1>
+
+    </header>
+
+
+    <!-- =========================================
+         NAVIGATION
+    ========================================== -->
+
+    <nav>
+
+        <a href="https://billakosmodelhorses.com">
+            Home
+        </a>
+
+        <a href="https://billakosmodelhorses.com/stablestories.html">
+            Stable Stories
+        </a>
+
+        <a href="https://billakosmodelhorses.com/shows/modelhorseshows">
+            Shows
+        </a>
+
+        <a href="https://billakosmodelhorses.com/paddockchat.html">
+            Chat
+        </a>
+
+        <a href="https://billakosmodelhorses.com/paddockchat-archive.html">
+            Chat Archive
+        </a>
+
+    </nav>
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <section>
+
+
+        <center>
+
+            <h2>
+                Welcome to the Paddock Chat!
+            </h2>
+
+        </center>
+
+
+        <p>
+
+            You can chat about model horses or about anything you want in general!
+            Please be kind and respect other members of the forum.
+
+            Due to my restricted coding knowledge, I can't save the username
+            for every person and can't add edit functions for your posts.
+
+            Please use the same Name if you want to post more than once.
+
+            If you want to delete/edit something please mail me
+            (billakosmodelhorses@gmail.com) and I will respond as soon as possible.
+
+            If you want to add an image go to the bottom of this page.
+
+        </p>
+
+
+        <i>
+
+            <p>
+
+                <span style="color: #228B22;">
+
+                    Email me at billakosmodelhorses@gmail.com
+                    if you want to edit/delete something.
+
+                </span>
+
+            </p>
+
+        </i>
+
+
+        <!-- =========================================
+             MESSAGE FORM
+        ========================================== -->
+
+        <div class="comment-container">
+
+            <h2>
+                Leave a Message:
+            </h2>
+
+
+            <form id="commentForm">
+
+
+                <label for="nameInput">
+                    Your Name:
+                </label>
+
+                <br>
+
+
+                <input
+                    type="text"
+                    id="nameInput"
+                    placeholder="Enter your name"
+                    required>
+
+                <br>
+
+
+                <label for="commentInput">
+                    Your Message:
+                </label>
+
+                <br>
+
+
+                <textarea
+                    id="commentInput"
+                    rows="4"
+                    cols="50"
+                    placeholder="Write your comment here..."
+                    required>
+                </textarea>
+
+                <br>
+
+
+                <button type="submit">
+                    Submit Message
+                </button>
+
+
+            </form>
+
+        </div>
+
+
+        <!-- =========================================
+             RECENT MESSAGES
+        ========================================== -->
+
+        <div class="comments-display-container">
+
+            <h3>
+                Messages from the past 2 months:
+            </h3>
+
+
+            <div id="commentsSection">
+
+                <p>
+                    Loading messages...
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             IMAGE
+        ========================================== -->
+
+        <center>
+
+            <img
+                src="https://i.postimg.cc/3xFR4dBZ/84F3592A-3412-47D8-B6E4-3A5036A61855.png"
+                alt="Paddock Chat"
+                class="responsive-image"
+                width="600">
+
+        </center>
+
+
+        <br>
+
+
+        <!-- =========================================
+             PHOTO UPLOADING
+        ========================================== -->
+
+        <h2>
+            Photo Uploading
+        </h2>
+
+
+        <p>
+
+            1. Visit this free image hosting website and upload your photo:
+
+            <a href="https://postimages.org">
+                postimages.org
+            </a>
+
+        </p>
+
+
+        <p>
+
+            2. Copy the direct link (the 2nd) and use it here:
+
+        </p>
+
+
+        <p>
+
+            <code>
+
+                &lt;div class="blog-post"&gt;
+                &lt;center&gt;
+                &lt;img src="IMAGE LINK" width="400" height="400"&gt;
+                &lt;/center&gt;
+                &lt;/div&gt;
+
+            </code>
+
+        </p>
+
+
+        <p>
+
+            You can write whatever you want and then add an image
+            (you can also add text after the image).
+
+            If you want more images, just add more
+
+            <code>
+                &lt;img src="IMAGE LINK" width="400" height="400"&gt;
+            </code>
+
+            next to each other.
+
+        </p>
+
+
+    </section>
+
+
+    <br><br><br>
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================== -->
+
+    <footer>
+
+        <p>
+            Have fun chatting :)
+        </p>
+
+    </footer>
+
+
+</body>
+
+</html>
