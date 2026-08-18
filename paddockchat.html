@@ -336,17 +336,22 @@
 
                 /* Message */
 
-                const commentPara =
-                    document.createElement("p");
+const commentPara =
+    document.createElement("p");
 
+/*
+ * Allow the same HTML formatting that was
+ * originally used in the Paddock Chat.
+ *
+ * New lines are converted to <br> so that
+ * paragraph/line spacing is preserved.
+ *
+ * This also allows images, <center>, <div>,
+ * etc. used by the photo instructions below.
+ */
 
-                /*
-                 * textContent is used instead of innerHTML
-                 * so people cannot insert HTML/JavaScript.
-                 */
-
-                commentPara.textContent =
-                    comment.text;
+commentPara.innerHTML =
+    comment.text.replace(/\n/g, "<br>");
 
 
                 /* Add elements */
