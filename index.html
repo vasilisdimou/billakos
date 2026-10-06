@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Billakos Model Horses</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+      <!-- Standard Favicon -->
+<link rel="icon" href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png" type="image/png">
+
+<!-- iOS Specific (Apple Touch Icon) -->
+<link rel="apple-touch-icon" href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png">
+
+<!-- Optional: Fallbacks for other sizes -->
+<link rel="icon" type="image/png" sizes="32x32" href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://i.postimg.cc/nLyg39tP/6205-B9-F2-AE7-D-4105-AE47-78-BF6-B5-B531-A.png"> 
+    
+    
+
+
+
+
+
+
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyAJUJbeZ9ceRwaQOCboy79LEwbN-I7R9ro",
+          authDomain: "billakosmodelhorses.firebaseapp.com",
+          projectId: "billakosmodelhorses",
+          storageBucket: "billakosmodelhorses.appspot.com",
+          messagingSenderId: "988607299628",
+          appId: "1:988607299628:web:b7c2139b095a0afba8d189",
+          measurementId: "G-RWHNVMHN2P"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // Function to load comments
+        async function loadComments() {
+            const commentsCollection = collection(db, 'comments');
+            const q = query(commentsCollection, orderBy('timestamp', 'desc'));
+            const querySnapshot = await getDocs(q);
+            const comments = querySnapshot.docs.map(doc => doc.data());
+            renderComments(comments);
+        }
+
+        // Function to submit a new comment
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('commentForm').addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const name = document.getElementById('nameInput').value;
+                const text = document.getElementById('commentInput').value;
+
+                if (name && text) {
+                    try {
+                        await addDoc(collection(db, 'comments'), {
+                            name: name,
+                            text: text,
+                            timestamp: serverTimestamp()
+                        });
+                        document.getElementById('nameInput').value = '';
+                        document.getElementById('commentInput').value = '';
+                        loadComments(); // Reload comments after submission
+                    } catch (error) {
+                        console.error("Error adding comment: ", error);
+                    }
+                } else {
+                    console.log("Name and comment cannot be empty.");
+                }
+            });
+
+            // Load comments when the page loads
+            loadComments();
+        });
+
+        function renderComments(comments) {
+    const commentsSection = document.getElementById('commentsSection');
+    commentsSection.innerHTML = ''; // Clear existing comments
+
+    comments.forEach(comment => {
+        const commentDiv = document.createElement('div');
+        commentDiv.style.marginBottom = "15px";
+
+        const namePara = document.createElement('p');
+        namePara.style.fontWeight = "bold";
+        namePara.textContent = `${comment.name} wrote:`;
+
+        const commentPara = document.createElement('p');
+        commentPara.innerHTML = comment.text.replace(/\n/g, '<br>'); // Replace newlines with <br>
+
+        commentDiv.appendChild(namePara);
+        commentDiv.appendChild(commentPara);
+
+        commentsSection.appendChild(commentDiv);
+    });
+}
+
+
+  // ====== EMAIL SUBMISSION WITH RECAPTCHA ======
+document.addEventListener('DOMContentLoaded', () => {
+  const subscribeForm = document.getElementById('subscribeForm');
+  const subscribeMessage = document.getElementById('subscribeMessage');
+
+  if (!subscribeForm) return;
+
+  subscribeForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const emailInput = document.getElementById('emailInput');
+    const email = emailInput.value.trim();
+
+    // 1. Basic validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      subscribeMessage.style.color = "red";
+      subscribeMessage.textContent = "Please enter a valid email.";
+      return;
+    }
+
+    // 2. Get reCAPTCHA response
+    const recaptchaResponse = grecaptcha.getResponse();
+
+    if (!recaptchaResponse) {
+      subscribeMessage.style.color = "red";
+      subscribeMessage.textContent = "Please verify you're not a robot.";
+      return;
+    }
+
+    try {
+      // 3. OPTIONAL but recommended: verify CAPTCHA server-side
+      // (This is frontend-only version; still good improvement)
+      
+      await addDoc(collection(db, 'emails'), {
+        email: email,
+        recaptcha: recaptchaResponse,
+        timestamp: serverTimestamp()
+      });
+
+      subscribeMessage.style.color = "green";
+      subscribeMessage.textContent = "✅ Thanks for subscribing!";
+
+      emailInput.value = "";
+      grecaptcha.reset();
+
+    } catch (error) {
+      console.error(error);
+      subscribeMessage.style.color = "red";
+      subscribeMessage.textContent = "❌ Failed to save email.";
+    }
+  });
+});
+
+        
+    </script>
+
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body>
+    <header>
+        <h1>Billakos Model Horses</h1>
+    </header>
+
+    <nav>
+        <a href="https://billakosmodelhorses.com">Home</a>
+        <a href="https://billakosmodelhorses.com/shows/modelhorseshows">Shows</a>
+        <a href="https://billakosmodelhorses.com/game/catchthehorses.html">Game</a>
+    </nav>
+
+    <section>
+
+        <center><img src="https://i.postimg.cc/nLyg39tP/6205B9F2-AE7D-4105-AE47-78BF6B5B531A.png" width="250" height="250"></center>
+        
+
+
+
+        
+<p>Dear model horse collectors,
+I’ve come to the decision to shut down my website for now. Due to some personal issues, I don’t have the time or the courage to keep posting or maintaining the blog the way I’d like to.
+
+The Shows page will remain online (at least for now), since I’m still planning to host more shows in the future. The Catch the Horses mini game will also stay up as long as the website is active, and you can continue suggesting new models by emailing me at billakosmodelhorses@gmail.com.
+
+I might return in the future!
+
+This doesn’t mean I’m leaving the hobby. It’s simply a change to help me feel less overwhelmed and to give myself space to be more active in Facebook groups and on the Breyer forums.
+
+Thank you for understanding and for being part of my journey :)</p>
+
+
+
+
+</body>
+</html>
